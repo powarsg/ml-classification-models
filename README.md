@@ -1,2 +1,2 @@
-# ml-clasification-models
+# ml-classification-models
 Build an interactive Streamlit web application to demonstrate multiple classification models
