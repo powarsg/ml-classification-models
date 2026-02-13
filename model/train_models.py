@@ -22,9 +22,6 @@ import os
 import warnings
 warnings.filterwarnings('ignore')
 
-# Create model directory if it doesn't exist
-os.makedirs('model', exist_ok=True)
-
 # Load dataset
 print("Loading loan_data.csv...")
 df = pd.read_csv('loan_data.csv')
@@ -83,8 +80,8 @@ print(f"Test target distribution:\n{y_test.value_counts()}")
 # Store test set for later use in Streamlit app
 test_data = pd.DataFrame(X_test, columns=X.columns)
 test_data['loan_status'] = y_test.values
-test_data.to_csv('model/test_data.csv', index=False)
-print("\nTest data saved to model/test_data.csv")
+test_data.to_csv('test_data.csv', index=False)
+print("\nTest data saved to test_data.csv")
 
 # ============================================================
 # MODEL TRAINING AND EVALUATION
@@ -125,8 +122,8 @@ results.append({
     'MCC': mcc_lr
 })
 
-joblib.dump(lr, 'model/logistic_regression.joblib')
-print("✓ Model saved to model/logistic_regression.joblib")
+joblib.dump(lr, 'logistic_regression.joblib')
+print("✓ Model saved to logistic_regression.joblib")
 
 # 2. Decision Tree Classifier
 print("\n" + "="*60)
@@ -161,8 +158,8 @@ results.append({
     'MCC': mcc_dt
 })
 
-joblib.dump(dt, 'model/decision_tree.joblib')
-print("✓ Model saved to model/decision_tree.joblib")
+joblib.dump(dt, 'decision_tree.joblib')
+print("✓ Model saved to decision_tree.joblib")
 
 # 3. K-Nearest Neighbors
 print("\n" + "="*60)
@@ -197,8 +194,8 @@ results.append({
     'MCC': mcc_knn
 })
 
-joblib.dump(knn, 'model/knn.joblib')
-print("✓ Model saved to model/knn.joblib")
+joblib.dump(knn, 'knn.joblib')
+print("✓ Model saved to knn.joblib")
 
 # 4. Naive Bayes (Gaussian)
 print("\n" + "="*60)
@@ -233,8 +230,8 @@ results.append({
     'MCC': mcc_nb
 })
 
-joblib.dump(nb, 'model/naive_bayes.joblib')
-print("✓ Model saved to model/naive_bayes.joblib")
+joblib.dump(nb, 'naive_bayes.joblib')
+print("✓ Model saved to naive_bayes.joblib")
 
 # 5. Random Forest (Ensemble)
 print("\n" + "="*60)
@@ -269,8 +266,8 @@ results.append({
     'MCC': mcc_rf
 })
 
-joblib.dump(rf, 'model/random_forest.joblib')
-print("✓ Model saved to model/random_forest.joblib")
+joblib.dump(rf, 'random_forest.joblib')
+print("✓ Model saved to random_forest.joblib")
 
 # 6. XGBoost
 print("\n" + "="*60)
@@ -305,8 +302,8 @@ results.append({
     'MCC': mcc_xgb
 })
 
-joblib.dump(xgb, 'model/xgboost.joblib')
-print("✓ Model saved to model/xgboost.joblib")
+joblib.dump(xgb, 'xgboost.joblib')
+print("✓ Model saved to xgboost.joblib")
 
 # ============================================================
 # SAVE RESULTS
@@ -320,13 +317,13 @@ results_df = pd.DataFrame(results)
 print("\n" + results_df.to_string(index=False))
 
 # Save results to CSV
-results_df.to_csv('model/model_results.csv', index=False)
-print("\n✓ Results saved to model/model_results.csv")
+results_df.to_csv('model_results.csv', index=False)
+print("\n✓ Results saved to model_results.csv")
 
 # Save scaler and label encoders for later use in app
-joblib.dump(scaler, 'model/scaler.joblib')
-joblib.dump(label_encoders, 'model/label_encoders.joblib')
-joblib.dump(X.columns.tolist(), 'model/feature_names.joblib')
+joblib.dump(scaler, 'scaler.joblib')
+joblib.dump(label_encoders, 'label_encoders.joblib')
+joblib.dump(X.columns.tolist(), 'feature_names.joblib')
 print("✓ Scaler, label encoders, and feature names saved")
 
 print("\n" + "="*60)
