@@ -245,7 +245,12 @@ model = models[selected_model]
 
 # Get predictions - ensure only feature columns are used
 X_test = data_to_use[feature_names].copy()
-y_pred = model.predict(X_test)
+
+# Apply the same preprocessing pipeline: scaling
+X_test_scaled = scaler.transform(X_test)
+X_test_scaled = pd.DataFrame(X_test_scaled, columns=feature_names)
+
+y_pred = model.predict(X_test_scaled)
 
 if not use_user_data:
     y_true = test_data['loan_status'].values

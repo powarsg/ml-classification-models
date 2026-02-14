@@ -54,15 +54,7 @@ numerical_cols = X.select_dtypes(include=['float64', 'int64']).columns.tolist()
 print(f"\nCategorical columns: {categorical_cols}")
 print(f"Numerical columns: {numerical_cols}")
 
-# Encode categorical variables
-label_encoders = {}
-for col in categorical_cols:
-    le = LabelEncoder()
-    X[col] = le.fit_transform(X[col].astype(str))
-    label_encoders[col] = le
-    print(f"Encoded {col}: {dict(zip(le.classes_, le.transform(le.classes_)))}")
-
-# Train-Test Split (before scaling, so test data contains original encoded values)
+# Train-Test Split FIRST (before any encoding/scaling to avoid data leakage)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
@@ -72,13 +64,22 @@ print(f"Test set size: {X_test.shape[0]}")
 print(f"Train target distribution:\n{y_train.value_counts()}")
 print(f"Test target distribution:\n{y_test.value_counts()}")
 
-# Store test set with original (unscaled) values for evaluators
+# Encode categorical variables (fit on training data ONLY, apply to both)
+label_encoders = {}
+for col in categorical_cols:
+    le = LabelEncoder()
+    X_train[col] = le.fit_transform(X_train[col].astype(str))
+    X_test[col] = le.transform(X_test[col].astype(str))
+    label_encoders[col] = le
+    print(f"Encoded {col}: {dict(zip(le.classes_, le.transform(le.classes_)))}")
+
+# Store test set with original encoded (but unscaled) values for evaluators
 test_data = pd.DataFrame(X_test, columns=X.columns)
 test_data['loan_status'] = y_test.values
 test_data.to_csv('test_data.csv', index=False)
 print("\nTest data saved to test_data.csv")
 
-# Feature scaling (after saving original test data)
+# Feature scaling (fit on training data ONLY, apply to both)
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
