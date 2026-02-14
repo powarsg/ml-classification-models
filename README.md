@@ -83,56 +83,26 @@
 
 ## d. Observations on Model Performance
 
-### 1. Logistic Regression
-- **Performance:** Moderate baseline (89.24% accuracy)
-- **Strengths:** Interpretable, provides probability calibration
-- **Weaknesses:** Linear assumptions; cannot capture non-linear loan approval patterns
-- **Key Metric:** AUC 0.9486 shows good discrimination despite moderate accuracy
+| ML Model Name | Observation about model performance |
+|---|---|
+| **Logistic Regression** | Moderate baseline (89.27% accuracy). Interpretable with good AUC (0.9507), but linear assumptions limit non-linear pattern capture. Suitable for simple baseline comparisons. |
+| **Decision Tree** | Good performance (92.04% accuracy, 0.9605 AUC). Interpretable rules and feature interactions handled naturally. Conservative predictions (0.735 recall) may reject valid loans. Max depth=10 balances complexity and interpretability. |
+| **kNN** | Good accuracy (88.84%, 0.9292 AUC) capturing local patterns without assumptions. Computationally expensive for large datasets and sensitive to feature scaling. Similar precision-recall balance to Logistic Regression. |
+| **Naive Bayes** | Poor performance (72.82% accuracy). Critical issue: Extremely high recall (100%) but very low precision (0.45%) - approves almost all loans, unacceptable for production. Conditional independence assumption violated in loan data. High AUC (0.9403) doesn't guarantee practical performance. |
+| **Random Forest** | Excellent performance (92.11% accuracy, 0.9742 AUC). Robust ensemble handling non-linear patterns with feature importance insights. Better generalization than single decision tree. 100 trees reduce overfitting through averaging. Strong production candidate. |
+| **XGBoost 🏆** | **Best overall model (93.11% accuracy, 0.9788 AUC, 0.8362 F1, 0.7948 MCC).** Sequential boosting corrects errors iteratively. Handles imbalanced data natively. Best precision-recall balance. Optimal for production deployment. More stable predictions than Random Forest. |
 
-### 2. Decision Tree
-- **Performance:** Good (92.04% accuracy, 0.9597 AUC)
-- **Strengths:** Interpretable rules; handles feature interactions naturally
-- **Weaknesses:** Conservative predictions (0.74 recall) may reject valid loans
-- **Insights:** Max depth=10 balances complexity and interpretability
+### Key Learning - Imbalanced Data:
+- Accuracy alone is misleading (77.8% vs 22.2% class distribution)
+- AUC, F1, and MCC are more informative metrics for imbalanced datasets
+- Ensemble methods (Random Forest, XGBoost) naturally handle class imbalance better
+- Trade-off between precision and recall critical in loan approval decisions
 
-### 3. K-Nearest Neighbors
-- **Performance:** Good (89.00% accuracy, 0.9241 AUC)
-- **Strengths:** Captures local patterns without assumptions
-- **Weaknesses:** Computationally expensive for large datasets; sensitive to feature scaling
-- **Trade-off:** Similar precision-recall balance to Logistic Regression
-
-### 4. Naive Bayes
-- **Performance:** Lower (73.12% accuracy)
-- **Critical Issue:** Extremely high recall (99.85%) but low precision (0.45)
-  - Approves almost all loans → unacceptable for production
-- **Lesson:** High AUC doesn't guarantee practical performance
-- **Problem:** Conditional independence assumption violated in loan data (income and credit score are correlated)
-
-### 5. Random Forest
-- **Performance:** Excellent (92.45% accuracy, 0.9720 AUC)
-- **Strengths:** Robust ensemble; handles non-linear patterns; provides feature importance
-- **Advantages:** Better generalization than single decision tree
-- **Insight:** 100 trees reduce overfitting through averaging
-
-### 6. XGBoost **🏆 Best Model**
-- **Performance:** Best overall (93.11% accuracy, 0.9788 AUC, 0.8362 F1)
-- **Strengths:** Sequential boosting corrects errors; handles imbalanced data natively
-- **Precision-Recall:** Best balance with highest F1 and MCC (0.7948)
-- **Recommendation:** Optimal for production deployment
-- **Advantages over Random Forest:** Better convergence, more stable predictions
-
-### Comparative Insights
-
-**Model Selection by Priority:**
+### Model Selection by Priority:
 - **Maximum Accuracy:** XGBoost (93.11%)
 - **Balanced Performance:** Random Forest (92.11% accuracy + interpretability)
 - **Interpretability:** Decision Tree (92.04%) or Logistic Regression (89.27%)
 - **Production Use:** XGBoost (best AUC 0.9788 + F1 0.8362 + MCC 0.7948)
-
-**Key Learning - Imbalanced Data:**
-- Accuracy alone is misleading (77.8% vs 22.2% class distribution)
-- AUC, F1, MCC are more informative
-- Ensemble methods naturally handle class imbalance better
 
 ---
 
