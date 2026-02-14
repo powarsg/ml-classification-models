@@ -64,12 +64,12 @@
 
 | ML Model Name | Accuracy | AUC | Precision | Recall | F1 | MCC |
 |---|---|---|---|---|---|---|
-| Logistic Regression | 0.8924 | 0.9486 | 0.7614 | 0.7515 | 0.7564 | 0.6874 |
-| Decision Tree | 0.9204 | 0.9597 | 0.8863 | 0.7365 | 0.8045 | 0.7602 |
-| KNN | 0.8900 | 0.9241 | 0.7678 | 0.7240 | 0.7452 | 0.6756 |
-| Naive Bayes | 0.7312 | 0.9392 | 0.4525 | 0.9985 | 0.6228 | 0.5433 |
-| Random Forest (Ensemble) | 0.9245 | 0.9720 | 0.8906 | 0.7530 | 0.8160 | 0.7733 |
-| XGBoost (Ensemble) | 0.9284 | 0.9755 | 0.8835 | 0.7810 | 0.8291 | 0.7864 |
+| Logistic Regression | 0.8927 | 0.9507 | 0.7630 | 0.7500 | 0.7564 | 0.6876 |
+| Decision Tree | 0.9204 | 0.9605 | 0.8877 | 0.7350 | 0.8042 | 0.7601 |
+| KNN | 0.8884 | 0.9292 | 0.7672 | 0.7150 | 0.7402 | 0.6699 |
+| Naive Bayes | 0.7282 | 0.9403 | 0.4498 | 1.0000 | 0.6205 | 0.5410 |
+| Random Forest (Ensemble) | 0.9211 | 0.9742 | 0.8781 | 0.7490 | 0.8084 | 0.7629 |
+| **XGBoost (Ensemble)** | **0.9311** | **0.9788** | **0.8868** | **0.7910** | **0.8362** | **0.7948** |
 
 **Metrics Definitions:**
 - **Accuracy:** Overall correctness (0-1, higher is better)
@@ -114,20 +114,20 @@
 - **Advantages:** Better generalization than single decision tree
 - **Insight:** 100 trees reduce overfitting through averaging
 
-### 6. XGBoost **Best Model**
-- **Performance:** Best overall (92.84% accuracy, 0.9755 AUC, 0.8291 F1)
+### 6. XGBoost **🏆 Best Model**
+- **Performance:** Best overall (93.11% accuracy, 0.9788 AUC, 0.8362 F1)
 - **Strengths:** Sequential boosting corrects errors; handles imbalanced data natively
-- **Precision-Recall:** Best balance with highest F1 and MCC (0.7864)
+- **Precision-Recall:** Best balance with highest F1 and MCC (0.7948)
 - **Recommendation:** Optimal for production deployment
 - **Advantages over Random Forest:** Better convergence, more stable predictions
 
 ### Comparative Insights
 
 **Model Selection by Priority:**
-- **Maximum Accuracy:** XGBoost (92.84%)
-- **Balanced Performance:** Random Forest (accuracy + interpretability)
-- **Interpretability:** Decision Tree or Logistic Regression
-- **Production Use:** XGBoost (best AUC + F1 + MCC)
+- **Maximum Accuracy:** XGBoost (93.11%)
+- **Balanced Performance:** Random Forest (92.11% accuracy + interpretability)
+- **Interpretability:** Decision Tree (92.04%) or Logistic Regression (89.27%)
+- **Production Use:** XGBoost (best AUC 0.9788 + F1 0.8362 + MCC 0.7948)
 
 **Key Learning - Imbalanced Data:**
 - Accuracy alone is misleading (77.8% vs 22.2% class distribution)
