@@ -89,21 +89,16 @@ results_df = load_results()
 # Sidebar
 st.sidebar.header("📊 Configuration")
 
-# Section 0: Dataset Download
-st.sidebar.subheader("0️⃣ Dataset Download")
-@st.cache_data
-def load_dataset():
-    return pd.read_csv('model/loan_data.csv')
-
-dataset = load_dataset()
+# Section 0: Test Data Download
+st.sidebar.subheader("0️⃣ Test Data Download")
 st.sidebar.download_button(
-    label="📥 Download Training Dataset (CSV)",
-    data=dataset.to_csv(index=False),
-    file_name="loan_data.csv",
+    label="📥 Download Test Data (CSV)",
+    data=test_data.to_csv(index=False),
+    file_name="test_data.csv",
     mime="text/csv",
-    help="Download the original loan dataset used to train all models"
+    help="Download test data to verify model predictions"
 )
-st.sidebar.info("💾 Download the dataset to test models locally or verify results")
+st.sidebar.info("💾 Download test data and upload back to app to verify model predictions")
 
 st.sidebar.divider()
 
@@ -130,6 +125,15 @@ uploaded_file = st.sidebar.file_uploader(
 if uploaded_file is not None:
     try:
         user_data = pd.read_csv(uploaded_file)
+        # Drop loan_status if it exists in uploaded data
+        if 'loan_status' in user_data.columns:
+            user_data = user_data.drop('loan_status', axis=1)
+        
+        # Apply label encoders to categorical columns
+        for col in label_encoders.keys():
+            if col in user_data.columns:
+                user_data[col] = label_encoders[col].transform(user_data[col])
+        
         st.sidebar.success(f"✓ Loaded {len(user_data)} records")
         data_to_use = user_data
         use_user_data = True
@@ -239,44 +243,60 @@ st.subheader("🔮 Model Predictions on Test Data")
 
 model = models[selected_model]
 
-# Get predictions
-X_test = data_to_use.copy()
+# Get predictions - ensure only feature columns are used
+X_test = data_to_use[feature_names].copy()
 y_pred = model.predict(X_test)
 
 if not use_user_data:
     y_true = test_data['loan_status'].values
     
-    # Calculate confusion matrix
-    cm = confusion_matrix(y_true, y_pred)
+    # Calculate confusion matrix with labels in order: 0=Not Approved, 1=Approved
+    cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
+    # cm structure: rows=[0,1], cols=[0,1]
+    # Row 0: Not Approved actual [TN, FP]
+    # Row 1: Approved actual [FN, TP]
     
     col1, col2 = st.columns([1, 1])
     
     with col1:
         st.subheader("Confusion Matrix")
+        st.write("**Rows: Actual | Columns: Predicted**")
+        
+        # For display order: Approved (1) top, Not Approved (0) bottom
+        # X-axis: Approved (1) left, Not Approved (0) right
+        # We need to rearrange both rows and columns
+        cm_display = cm[[1, 0], :][:, [1, 0]]
+        # cm_display Row 0: Approved actual [TP, FN] 
+        # cm_display Row 1: Not Approved actual [FP, TN]
         
         # Create heatmap
+        # Plotly will display: first array element at bottom, last at top
+        # So reverse the data array to match reversed y-labels
+        cm_for_plot = cm_display[::-1]  # Flip rows for plotly display
+        
         fig_cm = ff.create_annotated_heatmap(
-            z=cm,
-            x=['Not Approved', 'Approved'],
-            y=['Not Approved', 'Approved'],
+            z=cm_for_plot,
+            x=['Approved (1)', 'Not Approved (0)'],
+            y=['Not Approved (0)', 'Approved (1)'],
             colorscale='Blues',
             showscale=True,
-            text=cm,
+            text=cm_for_plot,
             texttemplate='%{text}'
         )
         fig_cm.update_layout(title_text='', height=400, width=400)
-        fig_cm.update_xaxes(title_text='Predicted')
-        fig_cm.update_yaxes(title_text='Actual')
+        fig_cm.update_xaxes(title_text='Predicted Label')
+        fig_cm.update_yaxes(title_text='Actual Label')
         
         st.plotly_chart(fig_cm, use_container_width=True)
     
     with col2:
         st.subheader("Classification Report")
         
-        # Get classification report
+        # Get classification report with explicit order: 0, 1
         class_report = classification_report(
             y_true, y_pred,
-            target_names=['Not Approved', 'Approved'],
+            labels=[0, 1],
+            target_names=['Not Approved (0)', 'Approved (1)'],
             output_dict=True
         )
         
