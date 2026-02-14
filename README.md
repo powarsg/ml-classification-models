@@ -1,4 +1,4 @@
-# Loan Approval Status Classification Models
+# Loan Status Classification Models
 
 ## a. Problem Statement
 
