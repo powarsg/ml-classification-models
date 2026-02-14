@@ -62,12 +62,7 @@ for col in categorical_cols:
     label_encoders[col] = le
     print(f"Encoded {col}: {dict(zip(le.classes_, le.transform(le.classes_)))}")
 
-# Feature scaling
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-X = pd.DataFrame(X_scaled, columns=X.columns)
-
-# Train-Test Split
+# Train-Test Split (before scaling, so test data contains original encoded values)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
@@ -77,11 +72,18 @@ print(f"Test set size: {X_test.shape[0]}")
 print(f"Train target distribution:\n{y_train.value_counts()}")
 print(f"Test target distribution:\n{y_test.value_counts()}")
 
-# Store test set for later use in Streamlit app
+# Store test set with original (unscaled) values for evaluators
 test_data = pd.DataFrame(X_test, columns=X.columns)
 test_data['loan_status'] = y_test.values
 test_data.to_csv('test_data.csv', index=False)
 print("\nTest data saved to test_data.csv")
+
+# Feature scaling (after saving original test data)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+X_train = pd.DataFrame(X_train_scaled, columns=X.columns)
+X_test = pd.DataFrame(X_test_scaled, columns=X.columns)
 
 # ============================================================
 # MODEL TRAINING AND EVALUATION
