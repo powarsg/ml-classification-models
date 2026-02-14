@@ -125,8 +125,11 @@ uploaded_file = st.sidebar.file_uploader(
 if uploaded_file is not None:
     try:
         user_data = pd.read_csv(uploaded_file)
-        # Drop loan_status if it exists in uploaded data
+        
+        # Check if loan_status exists for confusion matrix
+        user_loan_status = None
         if 'loan_status' in user_data.columns:
+            user_loan_status = user_data['loan_status'].values
             user_data = user_data.drop('loan_status', axis=1)
         
         # Apply label encoders to categorical columns
@@ -137,13 +140,16 @@ if uploaded_file is not None:
         st.sidebar.success(f"✓ Loaded {len(user_data)} records")
         data_to_use = user_data
         use_user_data = True
+        has_user_labels = user_loan_status is not None
     except Exception as e:
         st.sidebar.error(f"Error loading file: {str(e)}")
         data_to_use = test_data.drop('loan_status', axis=1)
         use_user_data = False
+        has_user_labels = False
 else:
     data_to_use = test_data.drop('loan_status', axis=1)
     use_user_data = False
+    has_user_labels = False
 
 st.sidebar.divider()
 
@@ -252,9 +258,20 @@ X_test_scaled = pd.DataFrame(X_test_scaled, columns=feature_names)
 
 y_pred = model.predict(X_test_scaled)
 
+# Determine if we can calculate confusion matrix
+should_show_cm = False
+y_true = None
+
 if not use_user_data:
+    # Using default test data - always have labels
     y_true = test_data['loan_status'].values
-    
+    should_show_cm = True
+elif has_user_labels:
+    # User uploaded data with labels
+    y_true = user_loan_status
+    should_show_cm = True
+
+if should_show_cm:
     # Calculate confusion matrix with labels in order: 0=Not Approved, 1=Approved
     cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
     # cm structure: rows=[0,1], cols=[0,1]
@@ -317,7 +334,7 @@ if not use_user_data:
             }
         )
 else:
-    st.info("📝 Upload complete test data with 'loan_status' column to view confusion matrix and classification report")
+    st.info("📝 Upload data with 'loan_status' column to view confusion matrix and classification report")
 
 st.divider()
 
