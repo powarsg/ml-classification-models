@@ -150,15 +150,15 @@ st.sidebar.divider()
 
 # Preprocess data: Apply label encoders, then scaler
 @st.cache_data
-def preprocess_data(data, encoders, scaler, feature_list):
+def preprocess_data(data, _encoders, _scaler, feature_list):
     """Apply label encoding and scaling to data"""
     data_processed = data.copy()
     
     # Apply label encoders
-    for col in encoders.keys():
+    for col in _encoders.keys():
         if col in data_processed.columns:
             try:
-                data_processed[col] = encoders[col].transform(data_processed[col].astype(str))
+                data_processed[col] = _encoders[col].transform(data_processed[col].astype(str))
             except Exception as e:
                 st.error(f"Error encoding {col}: {str(e)}")
                 return None
@@ -168,7 +168,7 @@ def preprocess_data(data, encoders, scaler, feature_list):
     
     # Apply scaler
     try:
-        X_scaled = scaler.transform(X)
+        X_scaled = _scaler.transform(X)
         X_scaled_df = pd.DataFrame(X_scaled, columns=feature_list)
         return X_scaled_df
     except Exception as e:
@@ -367,7 +367,8 @@ st.divider()
 st.subheader("📋 Sample Predictions")
 st.write(f"Showing first 10 predictions from {len(data_to_use)} records")
 
-predictions_df = X_test.head(10).copy()
+# Display original encoded values (before scaling), not scaled values
+predictions_df = data_to_use.head(10).copy()
 predictions_df['Prediction'] = y_pred[:10]
 predictions_df['Prediction'] = predictions_df['Prediction'].map({0: 'Not Approved', 1: 'Approved'})
 
