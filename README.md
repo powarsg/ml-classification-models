@@ -1,4 +1,4 @@
-# Loan Status Binary Classification Models
+# Loan Approval Status Classification Models
 
 ## a. Problem Statement
 
