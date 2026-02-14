@@ -89,6 +89,24 @@ results_df = load_results()
 # Sidebar
 st.sidebar.header("📊 Configuration")
 
+# Section 0: Dataset Download
+st.sidebar.subheader("0️⃣ Dataset Download")
+@st.cache_data
+def load_dataset():
+    return pd.read_csv('model/loan_data.csv')
+
+dataset = load_dataset()
+st.sidebar.download_button(
+    label="📥 Download Training Dataset (CSV)",
+    data=dataset.to_csv(index=False),
+    file_name="loan_data.csv",
+    mime="text/csv",
+    help="Download the original loan dataset used to train all models"
+)
+st.sidebar.info("💾 Download the dataset to test models locally or verify results")
+
+st.sidebar.divider()
+
 # Section 1: Model Selection
 st.sidebar.subheader("1️⃣ Model Selection")
 selected_model = st.sidebar.selectbox(
