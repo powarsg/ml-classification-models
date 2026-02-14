@@ -132,15 +132,10 @@ if uploaded_file is not None:
             user_loan_status = user_data['loan_status'].values
             user_data = user_data.drop('loan_status', axis=1)
         
-        # Apply label encoders to categorical columns
-        for col in label_encoders.keys():
-            if col in user_data.columns:
-                user_data[col] = label_encoders[col].transform(user_data[col])
-        
-        st.sidebar.success(f"✓ Loaded {len(user_data)} records")
         data_to_use = user_data
         use_user_data = True
         has_user_labels = user_loan_status is not None
+        st.sidebar.success(f"✓ Loaded {len(user_data)} records")
     except Exception as e:
         st.sidebar.error(f"Error loading file: {str(e)}")
         data_to_use = test_data.drop('loan_status', axis=1)
@@ -150,6 +145,42 @@ else:
     data_to_use = test_data.drop('loan_status', axis=1)
     use_user_data = False
     has_user_labels = False
+
+st.sidebar.divider()
+
+# Preprocess data: Apply label encoders, then scaler
+@st.cache_data
+def preprocess_data(data, encoders, scaler, feature_list):
+    """Apply label encoding and scaling to data"""
+    data_processed = data.copy()
+    
+    # Apply label encoders
+    for col in encoders.keys():
+        if col in data_processed.columns:
+            try:
+                data_processed[col] = encoders[col].transform(data_processed[col].astype(str))
+            except Exception as e:
+                st.error(f"Error encoding {col}: {str(e)}")
+                return None
+    
+    # Select only feature columns in correct order
+    X = data_processed[feature_list].copy()
+    
+    # Apply scaler
+    try:
+        X_scaled = scaler.transform(X)
+        X_scaled_df = pd.DataFrame(X_scaled, columns=feature_list)
+        return X_scaled_df
+    except Exception as e:
+        st.error(f"Error scaling data: {str(e)}")
+        return None
+
+# Preprocess the data
+data_preprocessed = preprocess_data(data_to_use, label_encoders, scaler, feature_names)
+
+if data_preprocessed is None:
+    st.error("Failed to preprocess data. Please check your input.")
+    st.stop()
 
 st.sidebar.divider()
 
@@ -249,14 +280,8 @@ st.subheader("🔮 Model Predictions on Test Data")
 
 model = models[selected_model]
 
-# Get predictions - ensure only feature columns are used
-X_test = data_to_use[feature_names].copy()
-
-# Apply the same preprocessing pipeline: scaling
-X_test_scaled = scaler.transform(X_test)
-X_test_scaled = pd.DataFrame(X_test_scaled, columns=feature_names)
-
-y_pred = model.predict(X_test_scaled)
+# Use already preprocessed data
+y_pred = model.predict(data_preprocessed)
 
 # Determine if we can calculate confusion matrix
 should_show_cm = False
