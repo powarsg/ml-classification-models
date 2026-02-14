@@ -146,6 +146,7 @@ streamlit run app.py
 **Access Live App:**
 - Local: `http://localhost:8501`
 - Cloud: Deployed on Streamlit Community Cloud
+ `https://powarsg-ml-classification-models.streamlit.app/`
 
 ## Streamlit App Features
 
@@ -156,5 +157,4 @@ streamlit run app.py
 ✅ Classification report  
 ✅ Model comparison charts  
 ✅ Sample predictions  
-
 
