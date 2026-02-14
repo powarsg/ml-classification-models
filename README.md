@@ -1,6 +1,6 @@
 # Loan Status Binary Classification Models
 
-## a. Problem Statement [1 mark]
+## a. Problem Statement
 
 **Objective:** Predict loan approval status based on applicant demographics and financial information.
 
@@ -12,7 +12,7 @@
 
 ---
 
-## b. Dataset Description [1 mark]
+## b. Dataset Description
 
 **Dataset:** 45,000 loan application records (45,000 → 44,995 after preprocessing)
 
@@ -49,7 +49,7 @@
 
 ---
 
-## c. Models Used [6 marks - 1 mark for all metrics of each model]
+## c. Models Used
 
 ### 6 Classification Models Implemented
 
@@ -81,7 +81,7 @@
 
 ---
 
-## d. Observations on Model Performance [3 marks]
+## d. Observations on Model Performance
 
 ### 1. Logistic Regression
 - **Performance:** Moderate baseline (89.24% accuracy)
@@ -114,7 +114,7 @@
 - **Advantages:** Better generalization than single decision tree
 - **Insight:** 100 trees reduce overfitting through averaging
 
-### 6. XGBoost ⭐ **Best Model**
+### 6. XGBoost **Best Model**
 - **Performance:** Best overall (92.84% accuracy, 0.9755 AUC, 0.8291 F1)
 - **Strengths:** Sequential boosting corrects errors; handles imbalanced data natively
 - **Precision-Recall:** Best balance with highest F1 and MCC (0.7864)
